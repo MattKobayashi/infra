@@ -1,0 +1,26 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: bl-infra
+  namespace: flux-system
+spec:
+  path: ./clusters/binarylane/infra
+
+  dependsOn:
+    - name: bl-charts
+    - name: bl-crds
+
+  interval: 15m
+
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+
+  prune: true
+  validation: client
+
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-gpg

@@ -1,0 +1,27 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: mattflix-apps
+  namespace: flux-system
+spec:
+  path: ./clusters/mattflix/apps
+
+  dependsOn:
+    - name: mattflix-charts
+    - name: mattflix-crds
+    - name: mattflix-infra
+
+  interval: 15m
+
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+
+  prune: true
+  validation: client
+
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-gpg

@@ -1,0 +1,99 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.2.1/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: &app fireflyiii
+  namespace: fireflyiii
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      # -- Version of the app-template helm chart
+      # this example is not automatically updated, so be sure to use the latest chart version
+      version: 3.2.1
+      interval: 15m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-helm-charts
+        namespace: flux-system
+
+  values:
+    controllers:
+      main:
+        strategy: Recreate
+    
+        containers:
+          main:
+            image:
+              # -- image repository
+              repository: "fireflyiii/core"
+              # -- image tag
+              tag: "version-6.1.19"
+              # -- image pull policy
+              pullPolicy: IfNotPresent
+    
+            # -- environment variables
+            envFrom:
+              - config: fireflyiii-config
+
+      db:
+        strategy: Recreate
+
+        containers:
+          main:
+            image:
+              # -- image repository
+              repository: "postgres"
+              # -- image tag
+              tag: "16.3-alpine3.20"
+              # -- image pull policy
+              pullPolicy: IfNotPresent
+
+            # -- environment variables
+            env:
+              POSTGRES_USER: "firefly"
+              POSTGRES_PASSWORD: "firefly"
+              POSTGRES_DB: "firefly"
+              PGDATA: "/var/lib/postgresql/data/pgdata"
+
+    # -- Configures service settings for the chart.
+    service:
+      main:
+        controller: main
+        ports:
+          http:
+            port: &port 80
+    
+    ingress:
+      # -- Enable and configure ingress settings for the chart under this key.
+      main:
+        hosts:
+          - host: budget.kobayashi.au
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: http
+
+    # -- Configure persistence settings for the chart under this key.
+    persistence:
+      upload:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        advancedMounts:
+          main:
+            main:
+              - path: /var/www/html/storage/upload
+
+      database:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        advancedMounts:
+          db:
+            main:
+              - path: /var/lib/postgresql/data/pgdata

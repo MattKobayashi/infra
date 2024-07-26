@@ -1,0 +1,48 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.2.1/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: &app atlasprobe
+  namespace: atlasprobe
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      # -- Version of the app-template helm chart
+      # this example is not automatically updated, so be sure to use the latest chart version
+      version: 3.2.1
+      interval: 15m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-helm-charts
+        namespace: flux-system
+
+  values:
+    controllers:
+      main:
+        strategy: Recreate
+    
+        containers:
+          main:
+            image:
+              # -- image repository
+              repository: "jamesits/ripe-atlas"
+              # -- image tag
+              tag: "latest"
+              # -- image pull policy
+              pullPolicy: IfNotPresent
+    
+            # -- environment variables.
+            env:
+              RXTXRPT: "yes"
+    
+    # -- Configure persistence settings for the chart under this key.
+    persistence:
+      config:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 25Mi
+        globalMounts:
+          - path: /var/atlas-probe

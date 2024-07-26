@@ -1,0 +1,14 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: bl-infra-metallb
+  namespace: flux-system
+spec:
+  interval: 15m
+  path: ./clusters/binarylane/infra/metallb/app
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  wait: true
