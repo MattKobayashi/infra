@@ -4,5 +4,7 @@ kind: Kustomization
 namespace: flux-system
 resources:
   - bjw-s-charts.yaml
+  - cert-manager-charts.yaml
   - ingress-nginx-charts.yaml
   - metallb-charts.yaml
+  - plex-charts.yaml

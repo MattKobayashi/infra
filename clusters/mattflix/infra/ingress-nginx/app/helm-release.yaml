@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: ingress-nginx
-      version: 4.10.1
+      version: 4.11.2
       sourceRef:
         kind: HelmRepository
         name: ingress-nginx-charts
@@ -26,12 +26,18 @@ spec:
 
       replicaCount: 1
 
-      # HostNetwork for staging setup
-      hostNetwork: true
-
-      # Modify service type to ClusterIP
       service:
-        type: ClusterIP
+        type: LoadBalancer
+        externalTrafficPolicy: Local
+
+        ipFamilyPolicy: PreferDualStack
+
+        ipFamilies:
+          - IPv4
+          - IPv6
+
+        annotations:
+          "lbipam.cilium.io/ips": "192.168.0.24"
 
       publishService:
         enabled: true
