@@ -1,0 +1,16 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: mattflix-infra-ingress-nginx-app
+  namespace: flux-system
+spec:
+  interval: 15m
+  dependsOn:
+    - name: mattflix-infra-metallb-app
+  path: ./clusters/mattflix/infra/ingress-nginx/app
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  wait: true
