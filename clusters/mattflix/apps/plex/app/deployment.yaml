@@ -1,0 +1,93 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plex-deployment
+  namespace: plex
+  labels:
+    app: plex
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: plex
+  template:
+    metadata:
+      labels:
+        app: plex
+    spec:
+      containers:
+      - name: plex
+        env:
+          - name: PUID
+            value: "1000"
+          - name: PGID
+            value: "1000"
+          - name: VERSION
+            value: "public"
+          - name: TZ
+            value: "Australia/Brisbane"
+        image: lscr.io/linuxserver/plex:1.40.5
+        ports:
+          - containerPort: 32400
+            name: plex-main
+          - containerPort: 1900
+            name: plex-dlna-1
+          - containerPort: 32469
+            name: plex-dlna-2
+          - containerPort: 5353
+            name: plex-avahi
+          - containerPort: 8324
+            name: plex-roku
+          - containerPort: 32410
+            name: plex-gdm-1
+          - containerPort: 32412
+            name: plex-gdm-2
+          - containerPort: 32413
+            name: plex-gdm-3
+          - containerPort: 32414
+            name: plex-gdm-4
+        volumeMounts:
+          - name: plex-config
+            mountPath: /config
+          - name: plex-backup
+            mountPath: /backup
+          - name: media-movies
+            mountPath: /data/movies
+          - name: media-tv
+            mountPath: /data/tv
+          - name: media-audio
+            mountPath: /data/audio
+          - name: media-prerolls
+            mountPath: /data/prerolls
+          - name: temp-transcode
+            mountPath: /transcode
+      volumes:
+        - name: plex-config
+          hostPath:
+            path: /mnt/storage/volumes/plex
+            type: Directory
+        - name: plex-backup
+          hostPath:
+            path: /mnt/storage/backup/plex
+            type: Directory
+        - name: media-movies
+          hostPath:
+            path: /mnt/storage/media/movies
+            type: Directory
+        - name: media-tv
+          hostPath:
+            path: /mnt/storage/media/tv
+            type: Directory
+        - name: media-audio
+          hostPath:
+            path: /mnt/storage/media/audio
+            type: Directory
+        - name: media-prerolls
+          hostPath:
+            path: /mnt/storage/media/prerolls
+            type: Directory
+        - name: temp-transcode
+          emptyDir:
+            sizeLimit: 16Gi
+            medium: Memory
