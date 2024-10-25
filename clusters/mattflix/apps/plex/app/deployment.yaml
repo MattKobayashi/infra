@@ -27,7 +27,7 @@ spec:
             value: "public"
           - name: TZ
             value: "Australia/Brisbane"
-        image: lscr.io/linuxserver/plex:1.41.0
+        image: lscr.io/linuxserver/plex:1.41.1
         ports:
           - containerPort: 32400
             name: plex-main
